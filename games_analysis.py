@@ -76,3 +76,4 @@ adv_stats_df_final = pd.concat([adv_stats_df, offense_temp, defense_temp], axis 
 #Connecting to betting API and getting lines
 betting_api = cfbd.BettingApi(api_config)
 betting_temp = betting_api.get_lines(year = 2021)
+betting_temp[0]
