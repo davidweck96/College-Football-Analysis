@@ -75,5 +75,18 @@ adv_stats_df.drop(['offense', 'defense'], axis = 1, inplace = True)
 
 #Connecting to betting API and getting lines
 betting_api = cfbd.BettingApi(api_config)
-betting_temp = betting_api.get_lines(year = 2021)
-betting_temp[0]
+betting_df = pd.DataFrame()
+
+for i in range(2018, 2022):
+        betting_temp = betting_api.get_lines(year = i)
+        betting_df_temp = pd.DataFrame.from_records([dict(game_id = bet.id \
+                                                       , season = bet.season \
+                                                       , week = bet.week \
+                                                       , home_team = bet.home_team \
+                                                       , home_score = bet.home_score \
+                                                       , away_team = bet.away_team \
+                                                       , lines = bet.lines) \
+                                                       for bet in betting_temp])
+        betting_df = pd.concat([betting_df, betting_df_temp.dropna(axis = 0)], axis = 0)
+
+#Fixing lines columns of betting df
