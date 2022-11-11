@@ -14,7 +14,7 @@ api_config = cfbd.ApiClient(config)
 games_api = cfbd.GamesApi(api_config)
 game_results_df = pd.DataFrame()
 
-for i in range(2012, 2022):
+for i in range(2018, 2022):
     game_results_temp = games_api.get_games(year = i)
     game_results_df_temp = pd.DataFrame.from_records([dict(game_id = game.id \
                                                           , season = game.season \
@@ -47,7 +47,7 @@ for i in range(2012, 2022):
 stats_api = cfbd.StatsApi(api_config)
 adv_stats_df = pd.DataFrame()
 
-for i in range(2012,2022):
+for i in range(2018,2022):
     adv_stats_temp = stats_api.get_advanced_team_game_stats(year = i)
     adv_stats_df_temp = pd.DataFrame.from_records([dict(game_id = adv.game_id \
                                                         , team = adv.team \
