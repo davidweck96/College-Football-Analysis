@@ -70,8 +70,8 @@ defense_temp.dropna(axis = 0)
 defense_temp.columns = ['defense_' + defcol for defcol in defense_temp.columns]
 
 #Dropping original offense and defense columns from adv_stats_df and rejoining
-adv_stats_df.drop(['offense', 'defense'], axis = 1, inplace = True)
 adv_stats_df_final = pd.concat([adv_stats_df, offense_temp, defense_temp], axis = 1)
+adv_stats_df.drop(['offense', 'defense'], axis = 1, inplace = True)
 
 #Connecting to betting API and getting lines
 betting_api = cfbd.BettingApi(api_config)
