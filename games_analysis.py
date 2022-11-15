@@ -91,6 +91,6 @@ for i in range(2018, 2022):
 
 #Fixing lines columns of betting df
 lines_temp = betting_df['lines'].apply(lambda x: x[0].to_dict())
-lines_df = pd.DataFrame.from_records(lines_temp)
+lines_df = lines_temp.apply(pd.Series)
 
-betting_df2 = pd.concat([betting_df.drop('lines', axis = 1), lines_df], axis = 1).dropna(axis = 0)
+betting_df_final= pd.concat([betting_df.drop('lines', axis = 1), lines_df], axis = 1)
