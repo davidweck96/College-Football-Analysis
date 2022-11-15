@@ -86,7 +86,11 @@ for i in range(2018, 2022):
                                                        , home_score = bet.home_score \
                                                        , away_team = bet.away_team \
                                                        , lines = bet.lines) \
-                                                       for bet in betting_temp])
+                                                       for bet in betting_temp if bet.lines != []])
         betting_df = pd.concat([betting_df, betting_df_temp.dropna(axis = 0)], axis = 0)
 
 #Fixing lines columns of betting df
+lines_temp = betting_df['lines'].apply(lambda x: x[0].to_dict())
+lines_df = pd.DataFrame.from_records(lines_temp)
+
+betting_df2 = pd.concat([betting_df.drop('lines', axis = 1), lines_df], axis = 1).dropna(axis = 0)
