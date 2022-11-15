@@ -89,8 +89,16 @@ for i in range(2018, 2022):
                                                        for bet in betting_temp if bet.lines != []])
         betting_df = pd.concat([betting_df, betting_df_temp.dropna(axis = 0)], axis = 0)
 
-#Fixing lines columns of betting df
+#Fixing lines columns of betting df and creating final betting df
 lines_temp = betting_df['lines'].apply(lambda x: x[0].to_dict())
 lines_df = lines_temp.apply(pd.Series)
 
 betting_df_final= pd.concat([betting_df.drop('lines', axis = 1), lines_df], axis = 1)
+
+#CREATING FINAL DATAFRAME
+game_stats_df = game_results_df.merge(adv_stats_df_final \
+                               , how = 'inner'\
+                               , on = 'game_id').dropna(axis = 0)
+game_stats_bets_df = game_stats_df.merge(betting_df_final \
+                                       , how = 'inner' \
+                                       , on = 'game_id')
