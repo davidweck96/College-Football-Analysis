@@ -97,8 +97,8 @@ betting_df_final= pd.concat([betting_df.drop('lines', axis = 1), lines_df], axis
 
 #CREATING FINAL DATAFRAMES
 game_stats_df = game_results_df.merge(adv_stats_df_final \
-                               , how = 'inner'\
-                               , on = 'game_id').dropna(axis = 0)
+                                    , how = 'inner'\
+                                    , on = 'game_id').dropna(axis = 0)
 game_stats_bets_df = game_stats_df.merge(betting_df_final \
                                        , how = 'inner' \
                                        , on = 'game_id')
