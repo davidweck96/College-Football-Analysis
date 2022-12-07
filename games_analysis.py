@@ -77,7 +77,8 @@ betting_api = cfbd.BettingApi(api_config)
 betting_df = pd.DataFrame()
 
 #Setting book to pull from
-book = 'consensus'
+book = 'Bovada'
+sec_book = 'consensus'
 
 for i in range(2015, 2022):
         betting_temp = betting_api.get_lines(year = i)
@@ -94,7 +95,10 @@ for i in range(2015, 2022):
             try:
                 betting_df_temp.at[index, 'lines'] = [line for line in line_list if book in list(line.values())][0]
             except IndexError:
-                betting_df_temp.at[index, 'lines'] = None
+                try:
+                    betting_df_temp.at[index, 'lines'] = [line for line in line_list if sec_book in list(line.values())][0]
+                except IndexError:    
+                    betting_df_temp.at[index, 'lines'] = None
         betting_df = pd.concat([betting_df, betting_df_temp.dropna(axis = 0)], axis = 0)
 
 #Fixing lines columns of betting df and creating final betting df
