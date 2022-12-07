@@ -90,12 +90,12 @@ for i in range(2018, 2022):
                                                        , lines = bet.lines) \
                                                        for bet in betting_temp if bet.lines != []])
         for j in range(len(betting_df_temp['lines'])):
-            row = betting_df_temp['lines'].iloc[j]
+            row = betting_df_temp.iloc[j, betting_df_temp.columns.get_loc('lines')]
             line_list = [entry.to_dict() for entry in row]
             try:
-                betting_df_temp['lines'].iloc[j] = [line for line in line_list if book in list(line.values())][0]
+                betting_df_temp.iloc[j, betting_df_temp.columns.get_loc('lines')] = [line for line in line_list if book in list(line.values())][0]
             except IndexError:
-                betting_df_temp['lines'].iloc[j] = None
+                betting_df_temp.iloc[j, betting_df_temp.columns.get_loc('lines')] = None
         betting_df = pd.concat([betting_df, betting_df_temp.dropna(axis = 0)], axis = 0)
 
 #Fixing lines columns of betting df and creating final betting df
