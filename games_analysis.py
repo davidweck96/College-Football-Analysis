@@ -76,6 +76,9 @@ adv_stats_df_final.dropna(axis = 0, inplace = True)
 betting_api = cfbd.BettingApi(api_config)
 betting_df = pd.DataFrame()
 
+#Setting book to pull from
+book = 'consensus'
+
 for i in range(2018, 2022):
         betting_temp = betting_api.get_lines(year = i)
         betting_df_temp = pd.DataFrame.from_records([dict(game_id = bet.id \
@@ -86,10 +89,17 @@ for i in range(2018, 2022):
                                                        , away_team = bet.away_team \
                                                        , lines = bet.lines) \
                                                        for bet in betting_temp if bet.lines != []])
+        for j in range(len(betting_df_temp['lines'])):
+            row = betting_df_temp['lines'].iloc[j]
+            line_list = [entry.to_dict() for entry in row]
+            try:
+                betting_df_temp['lines'].iloc[j] = [line for line in line_list if book in list(line.values())][0]
+            except IndexError:
+                betting_df_temp['lines'].iloc[j] = None
         betting_df = pd.concat([betting_df, betting_df_temp.dropna(axis = 0)], axis = 0)
 
 #Fixing lines columns of betting df and creating final betting df
-lines_temp = betting_df['lines'].apply(lambda x: x[0].to_dict())
+#lines_temp = betting_df['lines'].apply(lambda x: x[0].to_dict())
 lines_df = lines_temp.apply(pd.Series)
 
 betting_df_final= pd.concat([betting_df.drop('lines', axis = 1), lines_df], axis = 1)
