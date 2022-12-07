@@ -14,7 +14,7 @@ api_config = cfbd.ApiClient(config)
 games_api = cfbd.GamesApi(api_config)
 game_results_df = pd.DataFrame()
 
-for i in range(2018, 2022):
+for i in range(2015, 2022):
     game_results_temp = games_api.get_games(year = i)
     game_results_df_temp = pd.DataFrame.from_records([dict(game_id = game.id \
                                                           , season = game.season \
@@ -47,7 +47,7 @@ for i in range(2018, 2022):
 stats_api = cfbd.StatsApi(api_config)
 adv_stats_df = pd.DataFrame()
 
-for i in range(2018,2022):
+for i in range(2015,2022):
     adv_stats_temp = stats_api.get_advanced_team_game_stats(year = i)
     adv_stats_df_temp = pd.DataFrame.from_records([dict(game_id = adv.game_id \
                                                         , team = adv.team \
@@ -79,7 +79,7 @@ betting_df = pd.DataFrame()
 #Setting book to pull from
 book = 'consensus'
 
-for i in range(2018, 2022):
+for i in range(2015, 2022):
         betting_temp = betting_api.get_lines(year = i)
         betting_df_temp = pd.DataFrame.from_records([dict(game_id = bet.id \
                                                        , season = bet.season \
@@ -90,12 +90,11 @@ for i in range(2018, 2022):
                                                        , lines = bet.lines) \
                                                        for bet in betting_temp if bet.lines != []])
         for j in range(len(betting_df_temp['lines'])):
-            row = betting_df_temp['lines'].iloc[j, :]
-            line_list = [entry.to_dict() for entry in row]
+            line_list = [entry.to_dict() for row in betting_df_temp['lines'] for entry in row]
             try:
-                betting_df_temp['lines'].iloc[j, :] = [line for line in line_list if book in list(line.values())][0]
+                betting_df_temp.at[j, 'lines'] = [line for line in line_list if book in list(line.values())][0]
             except IndexError:
-                betting_df_temp['lines'].iloc[j, :] = None
+                betting_df_temp.at[j, 'lines'] = None
         betting_df = pd.concat([betting_df, betting_df_temp.dropna(axis = 0)], axis = 0)
 
 #Fixing lines columns of betting df and creating final betting df
