@@ -89,12 +89,12 @@ for i in range(2015, 2022):
                                                        , away_team = bet.away_team \
                                                        , lines = bet.lines) \
                                                        for bet in betting_temp if bet.lines != []])
-        for j in range(len(betting_df_temp['lines'])):
-            line_list = [entry.to_dict() for row in betting_df_temp['lines'] for entry in row]
+        for index, row in betting_df_temp.iterrows():
+            line_list = [record.to_dict() for record in row['lines']]
             try:
-                betting_df_temp.at[j, 'lines'] = [line for line in line_list if book in list(line.values())][0]
+                betting_df_temp.at[index, 'lines'] = [line for line in line_list if book in list(line.values())][0]
             except IndexError:
-                betting_df_temp.at[j, 'lines'] = None
+                betting_df_temp.at[index, 'lines'] = None
         betting_df = pd.concat([betting_df, betting_df_temp.dropna(axis = 0)], axis = 0)
 
 #Fixing lines columns of betting df and creating final betting df
