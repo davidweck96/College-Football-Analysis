@@ -14,11 +14,53 @@ config.api_key['Authorization'] = '8om4vZLNAnCGJAIgUpd8ssn1to1r79RduXsVvdazw/z9x
 config.api_key_prefix['Authorization'] = 'Bearer'
 api_config = cfbd.ApiClient(config)
 
+#Setting date ranges for data pull
+start_year = 2015
+end_year = 2022
+
+#######
+# TEAMS
+#######
+
+#Connecting to teams API and getting teams data
+teams_api = cfbd.TeamsApi(api_config)
+teams_df = pd.DataFrame()
+
+#Call Teams API and get FBS Teams
+teams_api = cfbd.TeamsApi(api_config)
+teams = teams_api.get_fbs_teams()
+
+#Put teams into dataframe and clean up columns
+teams_df = pd.DataFrame.from_records([t.to_dict() for t in teams])
+teams_df = pd.concat([teams_df.drop('location', axis = 1), teams_df['location'].apply(pd.Series)], axis = 1)
+teams_df['logo1'] = [teams_df['logos'][i][0] for i in range(len(teams_df))]
+teams_df['logo2'] = [teams_df['logos'][i][1] for i in range(len(teams_df))]
+teams_df.drop('logos', axis = 1, inplace = True)
+teams_df.rename(columns = {'school' : 'team'}, inplace = True)
+
+#Writing to CSV
+teams_df.to_csv(cwd + "\\Data\\college_football_analysis\\teams.csv", index = False)
+
+#Pulling team talent scores
+talent_df = pd.DataFrame()
+
+for i in range(start_year, end_year):
+    talent_temp = teams_api.get_talent(year = i)
+    talent_df_temp = pd.DataFrame.from_records([talent.to_dict() for talent in talent_temp])
+    talent_df = pd.concat([talent_df, talent_df_temp.dropna(axis = 0)], axis = 0)
+
+#Writing to CSV
+talent_df.to_csv(cwd + "\\Data\\college_football_analysis\\talent_df.csv", index = False)
+
+#######
+# GAMES
+#######
+
 #Connecting to games API and getting game data
 games_api = cfbd.GamesApi(api_config)
 game_results_df = pd.DataFrame()
 
-for i in range(2015, 2022):
+for i in range(start_year, end_year):
     game_results_temp = games_api.get_games(year = i)
     game_results_df_temp = pd.DataFrame.from_records([dict(game_id = game.id \
                                                           , season = game.season \
@@ -49,11 +91,15 @@ for i in range(2015, 2022):
 #Writing to CSV
 game_results_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_df.csv", index = False)
 
+#######
+# ADV STATS
+#######
+
 #Connecting to advanced stats API and getting games stats
 stats_api = cfbd.StatsApi(api_config)
 adv_stats_df = pd.DataFrame()
 
-for i in range(2015,2022):
+for i in range(start_year, end_year):
     adv_stats_temp = stats_api.get_advanced_team_game_stats(year = i, exclude_garbage_time = True)
     adv_stats_df_temp = pd.DataFrame.from_records([dict(game_id = adv.game_id \
                                                         , team = adv.team \
@@ -81,6 +127,10 @@ adv_stats_df_final.dropna(axis = 0, inplace = True)
 #Writing to CSV
 adv_stats_df_final.to_csv(cwd + "\\Data\\college_football_analysis\\adv_stats_df.csv", index = False)
 
+#######
+# BETTING
+#######
+
 #Connecting to betting API and getting lines
 betting_api = cfbd.BettingApi(api_config)
 betting_df = pd.DataFrame()
@@ -89,7 +139,7 @@ betting_df = pd.DataFrame()
 book = 'Bovada'
 sec_book = 'consensus'
 
-for i in range(2015, 2022):
+for i in range(start_year, end_year):
         betting_temp = betting_api.get_lines(year = i)
         betting_df_temp = pd.DataFrame.from_records([dict(game_id = bet.id \
                                                        , season = bet.season \
@@ -117,16 +167,67 @@ betting_df_final= pd.concat([betting_df.drop('lines', axis = 1), lines_df], axis
 #Writing to CSV
 betting_df_final.to_csv(cwd + "\\Data\\college_football_analysis\\betting_df.csv", index = False)
 
+#######
+# RECRUITING
+#######
+
 #Connecting to recruiting API and getting recruiting rankings
-bettng_api = cfbd.BettingApi(api_config)
-betting_df = pd.DataFrame()
+recruiting_api = cfbd.RecruitingApi(api_config)
+recruiting_rank_df = pd.DataFrame()
+
+for i in range(start_year, end_year):
+    recruiting_temp = recruiting_api.get_recruiting_teams(year = i)
+    recruiting_df_temp = pd.DataFrame.from_records([dict(year = recruit.year \
+                                                        , rank = recruit.rank \
+                                                        , team = recruit.team \
+                                                        , points = recruit.points) \
+                                                        for recruit in recruiting_temp])
+    recruiting_rank_df = pd.concat([recruiting_rank_df, recruiting_df_temp.dropna(axis = 0)], axis = 0)
+
+#Writing to CSV
+recruiting_rank_df.to_csv(cwd + "\\Data\\college_football_analysis\\recruiting_df.csv", index = False)
+
+#######
+# PLAYERS
+#######
+
+#Connecting to players API and getting returning production
+players_api = cfbd.PlayersApi(api_config)
+returning_production_df = pd.DataFrame()
+
+for i in range(start_year, end_year):
+    production_temp = players_api.get_returning_production(year = i)
+    returning_production_df_temp = pd.DataFrame.from_records([dict(year = prod.season \
+                                                        , team = prod.team \
+                                                        , total_PPA = prod.total_ppa \
+                                                        , total_passing_ppa = prod.total_passing_ppa \
+                                                        , total_receiving_ppa = prod.total_receiving_ppa \
+                                                        , total_rushing_ppa = prod.total_rushing_ppa \
+                                                        , percent_ppa = prod.percent_ppa \
+                                                        , percent_passing_ppa = prod.percent_passing_ppa \
+                                                        , percent_receiving_ppa = prod.percent_receiving_ppa \
+                                                        , perecent_rushing_ppa = prod.percent_rushing_ppa \
+                                                        , usage = prod.usage \
+                                                        , passing_usage = prod.passing_usage \
+                                                        , receiving_usage = prod.receiving_usage \
+                                                        , rushing_usage = prod.rushing_usage) \
+                                                        for prod in production_temp])
+    returning_production_df = pd.concat([returning_production_df, returning_production_df_temp.dropna(axis = 0)], axis = 0)
+
+#CONSIDER ADDING TRANSFER PORTAL RANKINGS
+
+#Writing to CSV
+returning_production_df.to_csv(cwd + "\\Data\\college_football_analysis\\recruiting_df.csv", index = False)
+
+#CONSIDER ADDING POSITION RANKINGS
 
 
+####SAVE FOR LATER
 #CREATING FINAL DATAFRAMES
-game_stats_df = game_results_df.merge(adv_stats_df_final \
-                                    , how = 'inner'\
-                                    , on = 'game_id').dropna(axis = 0)
-game_stats_bets_df = game_stats_df.merge(betting_df_final \
-                                       , how = 'inner' \
-                                       , on = 'game_id')
-game_stats_bets_df_clean = game_stats_bets_df.dropna(axis = 0)
+#game_stats_df = game_results_df.merge(adv_stats_df_final \
+#                                    , how = 'inner'\
+#                                    , on = 'game_id').dropna(axis = 0)
+#game_stats_bets_df = game_stats_df.merge(betting_df_final \
+#                                       , how = 'inner' \
+#                                       , on = 'game_id')
+#game_stats_bets_df_clean = game_stats_bets_df.dropna(axis = 0)
