@@ -3,6 +3,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+
+#Working directory for writing csv files
+cwd = os.getcwd()
 
 #Configure API
 config = cfbd.Configuration()
@@ -42,13 +46,15 @@ for i in range(2015, 2022):
                                                           for game in game_results_temp])
     game_results_df = pd.concat([game_results_df, game_results_df_temp.dropna(axis=0)], axis=0)
     
+#Writing to CSV
+game_results_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_df.csv", index = False)
 
 #Connecting to advanced stats API and getting games stats
 stats_api = cfbd.StatsApi(api_config)
 adv_stats_df = pd.DataFrame()
 
 for i in range(2015,2022):
-    adv_stats_temp = stats_api.get_advanced_team_game_stats(year = i)
+    adv_stats_temp = stats_api.get_advanced_team_game_stats(year = i, exclude_garbage_time = True)
     adv_stats_df_temp = pd.DataFrame.from_records([dict(game_id = adv.game_id \
                                                         , team = adv.team \
                                                         , opponent = adv.opponent \
@@ -71,6 +77,9 @@ defense_temp.columns = ['defense_' + defcol for defcol in defense_temp.columns]
 adv_stats_df_final = pd.concat([adv_stats_df, offense_temp, defense_temp], axis = 1)
 adv_stats_df_final.drop(['offense', 'defense'], axis = 1, inplace = True)
 adv_stats_df_final.dropna(axis = 0, inplace = True)
+
+#Writing to CSV
+adv_stats_df_final.to_csv(cwd + "\\Data\\college_football_analysis\\adv_stats_df.csv", index = False)
 
 #Connecting to betting API and getting lines
 betting_api = cfbd.BettingApi(api_config)
@@ -103,8 +112,15 @@ for i in range(2015, 2022):
 
 #Fixing lines columns of betting df and creating final betting df
 lines_df = betting_df['lines'].apply(pd.Series)
-
 betting_df_final= pd.concat([betting_df.drop('lines', axis = 1), lines_df], axis = 1)
+
+#Writing to CSV
+betting_df_final.to_csv(cwd + "\\Data\\college_football_analysis\\betting_df.csv", index = False)
+
+#Connecting to recruiting API and getting recruiting rankings
+bettng_api = cfbd.BettingApi(api_config)
+betting_df = pd.DataFrame()
+
 
 #CREATING FINAL DATAFRAMES
 game_stats_df = game_results_df.merge(adv_stats_df_final \
