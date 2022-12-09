@@ -128,6 +128,22 @@ adv_stats_df_final.dropna(axis = 0, inplace = True)
 adv_stats_df_final.to_csv(cwd + "\\Data\\college_football_analysis\\adv_stats_df.csv", index = False)
 
 #######
+# METRICS
+#######
+
+#Connecting to metrics API and getting win probabilities
+metrics_api = cfbd.MetricsApi(api_config)
+win_prob_df = pd.DataFrame()
+
+for i in range(start_year, end_year):
+    win_prob_temp = metrics_api.get_pregame_win_probabilities(year = i)
+    win_prob_df_temp = pd.DataFrame.from_records([metric.to_dict() for metric in win_prob_temp])
+    win_prob_df = pd.concat([win_prob_df, win_prob_df_temp.dropna(axis = 0)], axis = 0)
+
+#Writing to CSV
+win_prob_df.to_csv(cwd + "\\Data\\college_football_analysis\\win_prob_df.csv", index = False)
+
+#######
 # BETTING
 #######
 
