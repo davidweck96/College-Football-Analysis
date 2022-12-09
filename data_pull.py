@@ -203,6 +203,8 @@ for i in range(start_year, end_year):
 #Writing to CSV
 recruiting_rank_df.to_csv(cwd + "\\Data\\college_football_analysis\\recruiting_df.csv", index = False)
 
+#CONSIDER ADDING POSITION RANKINGS
+
 #######
 # PLAYERS
 #######
@@ -230,12 +232,10 @@ for i in range(start_year, end_year):
                                                         for prod in production_temp])
     returning_production_df = pd.concat([returning_production_df, returning_production_df_temp.dropna(axis = 0)], axis = 0)
 
-#CONSIDER ADDING TRANSFER PORTAL RANKINGS
-
 #Writing to CSV
 returning_production_df.to_csv(cwd + "\\Data\\college_football_analysis\\recruiting_df.csv", index = False)
 
-#CONSIDER ADDING POSITION RANKINGS
+#CONSIDER ADDING TRANSFER PORTAL RANKINGS
 
 
 ####SAVE FOR LATER
