@@ -163,6 +163,7 @@ for i in range(start_year, end_year):
                                                        , home_team = bet.home_team \
                                                        , home_score = bet.home_score \
                                                        , away_team = bet.away_team \
+                                                       , away_score = bet.away_score \
                                                        , lines = bet.lines) \
                                                        for bet in betting_temp if bet.lines != []])
         for index, row in betting_df_temp.iterrows():
