@@ -194,9 +194,9 @@ recruiting_rank_df = pd.DataFrame()
 for i in range(start_year, end_year):
     recruiting_temp = recruiting_api.get_recruiting_teams(year = i)
     recruiting_df_temp = pd.DataFrame.from_records([dict(year = recruit.year \
-                                                        , rank = recruit.rank \
+                                                        , recruiting_rank = recruit.rank \
                                                         , team = recruit.team \
-                                                        , points = recruit.points) \
+                                                        , recruiting_points = recruit.points) \
                                                         for recruit in recruiting_temp])
     recruiting_rank_df = pd.concat([recruiting_rank_df, recruiting_df_temp.dropna(axis = 0)], axis = 0)
 
@@ -217,18 +217,18 @@ for i in range(start_year, end_year):
     production_temp = players_api.get_returning_production(year = i)
     returning_production_df_temp = pd.DataFrame.from_records([dict(year = prod.season \
                                                         , team = prod.team \
-                                                        , total_PPA = prod.total_ppa \
-                                                        , total_passing_ppa = prod.total_passing_ppa \
-                                                        , total_receiving_ppa = prod.total_receiving_ppa \
-                                                        , total_rushing_ppa = prod.total_rushing_ppa \
-                                                        , percent_ppa = prod.percent_ppa \
-                                                        , percent_passing_ppa = prod.percent_passing_ppa \
-                                                        , percent_receiving_ppa = prod.percent_receiving_ppa \
-                                                        , perecent_rushing_ppa = prod.percent_rushing_ppa \
-                                                        , usage = prod.usage \
-                                                        , passing_usage = prod.passing_usage \
-                                                        , receiving_usage = prod.receiving_usage \
-                                                        , rushing_usage = prod.rushing_usage) \
+                                                        , returning_PPA = prod.total_ppa \
+                                                        , returning_passing_ppa = prod.total_passing_ppa \
+                                                        , returning_receiving_ppa = prod.total_receiving_ppa \
+                                                        , returning_rushing_ppa = prod.total_rushing_ppa \
+                                                        , returning_ppa_percent = prod.percent_ppa \
+                                                        , returning_passing_ppa_percent = prod.percent_passing_ppa \
+                                                        , returning_receiving_ppa_percent = prod.percent_receiving_ppa \
+                                                        , returning_rushing_ppa_percent = prod.percent_rushing_ppa \
+                                                        , returning_usage = prod.usage \
+                                                        , returning_passing_usage = prod.passing_usage \
+                                                        , returning_receiving_usage = prod.receiving_usage \
+                                                        , returning_rushing_usage = prod.rushing_usage) \
                                                         for prod in production_temp])
     returning_production_df = pd.concat([returning_production_df, returning_production_df_temp.dropna(axis = 0)], axis = 0)
 
