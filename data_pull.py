@@ -16,7 +16,7 @@ api_config = cfbd.ApiClient(config)
 
 #Setting date ranges for data pull
 start_year = 2015
-end_year = 2022
+end_year = 2023
 
 #######
 # TEAMS
