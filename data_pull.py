@@ -86,7 +86,10 @@ for i in range(start_year, end_year):
                                                           , home_pregame_elo = game.home_pregame_elo \
                                                           , home_team = game.home_team) \
                                                           for game in game_results_temp])
-    game_results_df = pd.concat([game_results_df, game_results_df_temp.dropna(axis=0)], axis=0)
+    #if i != 2022:
+     #   game_results_df = pd.concat([game_results_df, game_results_df_temp.dropna(axis=0)], axis=0)
+    #else:
+    game_results_df = pd.concat([game_results_df, game_results_df_temp[game_results_df_temp.home_division == 'fbs' & game_results_df_temp.away_division == 'fbs'].reset_index()], axis = 0)
     
 #Writing to CSV
 game_results_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_df.csv", index = False)
