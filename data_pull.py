@@ -96,6 +96,17 @@ for i in range(start_year, end_year):
 #Writing to CSV
 game_results_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_df.csv", index = False)
 
+
+#Connecting to games API and getting game stats data
+game_results_stats_df = pd.DataFrame()
+
+ids_and_years = zip(game_results_df['game_id'], game_results_df['season'])
+
+for game, season in ids_and_years:
+    game_results_stats_temp = games_api.get_team_game_stats(game_id = game, year = season)
+    game_results_stats_df_temp = pd.DataFrame.from_records([grs.to_dict() for grs in game_results_stats_temp])
+    game_results_stats_df = pd.concat([game_results_stats_df, game_results_stats_df_temp.dropna(axis = 0)], axis = 0)
+
 #######
 # ADV STATS
 #######
