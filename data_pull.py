@@ -107,6 +107,37 @@ for game, season in ids_and_years:
     game_results_stats_df_temp = pd.DataFrame.from_records([grs.to_dict() for grs in game_results_stats_temp])
     game_results_stats_df = pd.concat([game_results_stats_df, game_results_stats_df_temp.dropna(axis = 0)], axis = 0)
 
+game_results_stats_df.reset_index(inplace = True, drop = True)
+
+#Cleaning up data
+id_col_temp = game_results_stats_df[['id']]
+teams_col_temp = game_results_stats_df['teams'].apply(pd.Series)
+teams_col_temp.columns = ['team_a', 'team_b']
+
+#Creating function to clean up stats column
+def extract_teams_cols(column):
+    temp_df = teams_col_temp[column].apply(pd.Series)
+    team_info_temp = temp_df[['school', 'points']]
+    temp_df2 = temp_df.stats.apply(lambda x: [{dic['category'] : dic['stat']} for dic in x])
+
+    temp_list = []
+    for idx, value in temp_df2.items():
+        temp_list.append({k:v for d in value for k,v in d.items()})
+    result = pd.DataFrame(temp_list)
+    
+    final_result = pd.concat([id_col_temp, team_info_temp, result], axis = 1)
+    return final_result
+
+#Calling function and merging datasets
+#Stacking them on top for joining later
+team_a = extract_teams_cols('team_a')
+team_b = extract_teams_cols('team_b')
+
+grs_final_df = pd.concat([team_a, team_b], axis = 0)
+
+#Writing to CSV
+grs_final_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_stats_df.csv", index = False)
+
 #######
 # ADV STATS
 #######
