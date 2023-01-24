@@ -133,7 +133,20 @@ def extract_teams_cols(column):
 team_a = extract_teams_cols('team_a')
 team_b = extract_teams_cols('team_b')
 
-grs_final_df = pd.concat([team_a, team_b], axis = 0)
+#Stacking dataset. Will join on ID and team later
+grs_df = pd.concat([team_a, team_b], axis = 0)
+
+#Converting columns to numeric
+convert_columns = ['fumblesRecovered', 'rushingTDs', 'puntReturnYards', 'puntReturnTDs', 'puntReturns',\
+                   'passingTDs', 'kickReturnYards', 'kickReturnTDs', 'kickReturns', 'kickingPoints', 'firstDowns',\
+                   'totalYards', 'netPassingYards', 'yardsPerPass', 'rushingYards', 'rushingAttempts',\
+                   'yardsPerRushAttempt', 'turnovers', 'fumblesLost', 'interceptions', 'interceptionYards',\
+                   'interceptionTDs', 'passesIntercepted', 'totalFumbles', 'tacklesForLoss', 'defensiveTDs',\
+                   'tackles', 'sacks', 'qbHurries', 'passesDeflected']
+grs_df[convert_columns] = grs_df[convert_columns].apply(pd.to_numeric)
+
+#Converting percentage columns to numeric from strings
+percentage_columns = ['thirdDownEff', 'fourthDownEff', 'completionAttempts']
 
 #Writing to CSV
 grs_final_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_stats_df.csv", index = False)
