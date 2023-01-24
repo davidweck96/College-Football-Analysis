@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import datetime
 import os
 
 #Working directory for writing csv files
@@ -144,6 +145,13 @@ convert_columns = ['fumblesRecovered', 'rushingTDs', 'puntReturnYards', 'puntRet
                    'interceptionTDs', 'passesIntercepted', 'totalFumbles', 'tacklesForLoss', 'defensiveTDs',\
                    'tackles', 'sacks', 'qbHurries', 'passesDeflected']
 grs_df[convert_columns] = grs_df[convert_columns].apply(pd.to_numeric)
+
+#Convert possession time
+grs_df['possessionTime'] = pd.to_datetime(grs_df['possessionTime'], format = '%M:%S')
+grs_df['possessionMinutes'] = grs_df['possessionTime'].dt.minute
+grs_df['possessionSeconds'] = grs_df['possessionTime'].dt.second
+grs_df['totalPossessionSeconds'] = grs_df['possessionMinutes'] * 60 + grs_df['possessionSeconds']
+grs_df.drop(['possessionTime', 'possessionMinutes', 'possessionSeconds'], axis = 1, inplace = True)
 
 #Converting percentage columns to numeric from strings
 percentage_columns = ['thirdDownEff', 'fourthDownEff', 'completionAttempts']
