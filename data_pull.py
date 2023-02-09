@@ -156,6 +156,20 @@ grs_df.drop(['possessionTime', 'possessionMinutes', 'possessionSeconds'], axis =
 #Converting percentage columns to numeric from strings
 percentage_columns = ['thirdDownEff', 'fourthDownEff', 'completionAttempts']
 
+#Function to fix percentage columns
+def fix_pct_cols(element):
+    element_str = str(element).split('-')
+    element_list = [int(x) for x in element_str]
+    if element_list[1] == 0:
+        output = 0
+    else:
+        output = element_list[0] / element_list[1]
+    return output
+
+grs_pct = (grs_df[percentage_columns]
+           .applymap(fix_pct_cols)
+           )
+           
 #Writing to CSV
 grs_final_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_stats_df.csv", index = False)
 
