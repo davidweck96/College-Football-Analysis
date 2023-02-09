@@ -153,6 +153,8 @@ grs_df['possessionSeconds'] = grs_df['possessionTime'].dt.second
 grs_df['totalPossessionSeconds'] = grs_df['possessionMinutes'] * 60 + grs_df['possessionSeconds']
 grs_df.drop(['possessionTime', 'possessionMinutes', 'possessionSeconds'], axis = 1, inplace = True)
 
+grs_df['penaltyYards'] = pd.to_numeric(grs_df.totalPenaltiesYards.str.split('-').apply(pd.Series)[1])
+
 #Converting percentage columns to numeric from strings
 percentage_columns = ['thirdDownEff', 'fourthDownEff', 'completionAttempts']
 
@@ -172,7 +174,7 @@ grs_pct = (grs_df[percentage_columns]
            .applymap(fix_pct_cols)
            )
 
-grs_final_df = pd.concat([grs_df.drop(['thirdDownEff', 'fourthDownEff', 'completionAttempts'], axis = 1), grs_pct], axis = 1)
+grs_final_df = pd.concat([grs_df.drop(['thirdDownEff', 'fourthDownEff', 'completionAttempts', 'totalPenaltiesYards'], axis = 1), grs_pct], axis = 1)
            
 #Writing to CSV
 grs_final_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_stats_df.csv", index = False)
