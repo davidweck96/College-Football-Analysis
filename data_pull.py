@@ -146,7 +146,7 @@ convert_columns = ['fumblesRecovered', 'rushingTDs', 'puntReturnYards', 'puntRet
                    'tackles', 'sacks', 'qbHurries', 'passesDeflected']
 grs_df[convert_columns] = grs_df[convert_columns].apply(pd.to_numeric)
 
-#Convert possession time
+#Convert possession time and penalty yards
 grs_df['possessionTime'] = pd.to_datetime(grs_df['possessionTime'], format = '%M:%S')
 grs_df['possessionMinutes'] = grs_df['possessionTime'].dt.minute
 grs_df['possessionSeconds'] = grs_df['possessionTime'].dt.second
@@ -159,8 +159,10 @@ percentage_columns = ['thirdDownEff', 'fourthDownEff', 'completionAttempts']
 #Function to fix percentage columns
 def fix_pct_cols(element):
     element_str = str(element).split('-')
-    element_list = [int(x) for x in element_str]
-    if element_list[1] == 0:
+    element_list = [x.replace('nan', '0') if x == 'nan' else int(x) for x in element_str]
+    if len(element_list) == 1:
+        output = 0
+    elif element_list[1] == 0:
         output = 0
     else:
         output = element_list[0] / element_list[1]
@@ -169,6 +171,8 @@ def fix_pct_cols(element):
 grs_pct = (grs_df[percentage_columns]
            .applymap(fix_pct_cols)
            )
+
+grs_final_df = pd.concat([grs_df.drop(['thirdDownEff', 'fourthDownEff', 'completionAttempts'], axis = 1), grs_pct], axis = 1)
            
 #Writing to CSV
 grs_final_df.to_csv(cwd + "\\Data\\college_football_analysis\\game_results_stats_df.csv", index = False)
