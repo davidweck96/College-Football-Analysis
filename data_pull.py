@@ -165,7 +165,7 @@ def fix_pct_cols(element):
     if len(element_list) == 1:
         output = 0
     elif element_list[1] == 0:
-        output = 0
+        output = np.nan
     else:
         output = element_list[0] / element_list[1]
     return output
